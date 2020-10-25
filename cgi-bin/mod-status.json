@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Content-type: application/json"
+echo "Access-Control-Allow-Origin: *"
+echo
+wget -O - http://modmon/status.json  # refacture in case of broken DNS

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+sLib="$(ls /usr/local/apache2/htdocs/*.lsdb|tail -1)"
+
+sComma=""
+echo "Content-type: application/json"
+echo "Access-Control-Allow-Origin: *"
+echo
+
+echo "["
+cut -f11 -d'|' ${sLib} |tr ';' '\n'|sort -u|
+while read sGen
+  do echo "${sComma}\"${sGen}\""
+  sComma=","
+done
+echo "]"

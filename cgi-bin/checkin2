@@ -1,0 +1,21 @@
+#!/bin/bash
+
+sWorking="/var/local/wrir-monitoring/"
+
+sFourCC="${1//[^A-Z0-9]/}"
+sFourCC="${sFourCC:0:4}"
+
+echo "Content-type: text/html"
+echo ''
+
+if [[ "${REMOTE_ADDR%.*}" == "192.168.200" ]] || [[ "${REMOTE_ADDR%.*}" == "127.0.0" ]] 
+then
+  mkdir -p ${sWorking}/${REMOTE_ADDR}
+  touch ${sWorking}/${REMOTE_ADDR}/checkin
+  if [[ "${REQUEST_METHOD}" == "POST" ]] && [[ ${#sFourCC} -eq 4 ]]
+  then
+    cat > ${sWorking}/${REMOTE_ADDR}/${sFourCC}.txt
+  fi
+#  set > ${sWorking}/${REMOTE_ADDR}/data.txt
+  echo "Thank you ${REMOTE_ADDR}"
+fi

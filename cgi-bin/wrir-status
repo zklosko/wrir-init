@@ -1,0 +1,33 @@
+#!/bin/bash
+
+sWorking="/var/local/wrir-monitoring/"
+
+echo "Content-type: text/html"
+echo ''
+
+echo "<HTML>"
+echo "<HEAD><TITLE>WRIR Status</TITLE></HEAD>"
+echo "<BODY>"
+echo "<p>Updated: $(date)</p>"
+sNow=$(date "+%s")
+for sFol in ${sWorking}/192.* ${sWorking}/127.*
+do
+  sHost=$(grep "${sFol##*/}\$" ${sWorking}/hosts.txt|cut -f1 -d' ')
+  [[ -z ${sHost} ]] && sHost=${sFol##*/}
+  echo "<ul>"
+  sCheckinTime=$(stat -c %Y ${sFol}/checkin)
+  sCheckinage=$(( sNow - sCheckinTime ))
+  echo "<li>${sHost} $(( sCheckinage / 60 )) minutes since checkin</li>"
+  [[ -f ${sFol}/DFHO.txt ]] && echo "<li>${sHost} $(<${sFol}/DFHO.txt) space on home</li>"
+  [[ -f ${sFol}/DFNY.txt ]] && echo "<li>${sHost} $(<${sFol}/DFNY.txt) space on Y share</li>"
+  [[ -f ${sFol}/DFNZ.txt ]] && echo "<li>${sHost} $(<${sFol}/DFNZ.txt) space on Z share</li>"
+  [[ -f ${sFol}/ARCH.txt ]] && echo "<li>${sHost} $(<${sFol}/ARCH.txt) being recorded</li>"
+  [[ -f ${sFol}/RAID.txt ]] && echo "<li>${sHost} $(<${sFol}/RAID.txt) RAID status</li>"
+  [[ -f ${sFol}/STRM.txt ]] && echo "<li>${sHost} $(<${sFol}/STRM.txt) stream status</li>"
+  [[ -f ${sFol}/UPSB.txt ]] && echo "<li>${sHost} $(<${sFol}/UPSB.txt) UPS Charge</li>"
+  [[ -f ${sFol}/UPSS.txt ]] && echo "<li>${sHost} $(<${sFol}/UPSS.txt) UPS status</li>"
+  echo "</ul>"
+done
+echo "</BODY>"
+echo "</HTML>"
+
