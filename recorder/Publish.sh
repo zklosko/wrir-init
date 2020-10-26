@@ -33,8 +33,8 @@ while read sFile ; do
     sShowYr=${sFile:0:4}
     sShowMo=${sFile:4:2}
     sShowDn=${sFile:6:2}
-    mkdir -p "~/Z/AUDIO ARCHIVE/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
-    if cp ${sFN}.mp3 "~/Z/AUDIO ARCHIVE/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
+    mkdir -p "~/Z/AUDIO ARCHIVES/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
+    if cp ${sFN}.mp3 "~/Z/AUDIO ARCHIVES/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
     then
       echo Archive good
     else

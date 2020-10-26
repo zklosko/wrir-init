@@ -11,12 +11,9 @@ do
   cd /scripts
   
   bash ./whatson4.sh &  # sending to background
-  sleep 5
-  
   bash ./posted.sh &
   bash ./getInfo2.sh &
   bash ./Publish.sh &
-  sleep 5
   
   #At 10 minutes to, get the new schedule, run cleanup. xx:50
   sMinuteHand=$(date +%M)
