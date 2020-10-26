@@ -17,8 +17,8 @@ cp recorder ~/
 
 # For Apache
 cp htdocs/index.html /var/www/html/index.html
-cp cgi-bin ...
-cp ... ...
+cp -r cgi-bin /usr/local/cgi-bin
+cp -r apache2 /etc/apache2
 
 # 3. Initialize setup
 
