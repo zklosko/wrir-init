@@ -13,12 +13,12 @@ apt update -y && apt install ffmpeg tzdata procps id3v2 \
 cp icecast.xml /etc/icecast2/
 
 # For the stream recorder
-cp -r recorder ~/
+cp -avr recorder/ ~/
 
 # For Apache
-cp htdocs/index.html /var/www/html/index.html
-cp -r cgi-bin /usr/local/cgi-bin
-cp -r apache2 /etc/apache2
+cp -avr html/ /var/www/html/
+cp -avr cgi-bin/ /usr/local/cgi-bin/
+cp -avr apache2/ /etc/apache2/
 
 # 3. Initialize setup
 
@@ -33,9 +33,9 @@ echo "//192.168.200.23/z ~/Z cifs credentials=/home/wrirops/.smbcredentials,ioch
 
 mount -a
 
-# Add stream recorder and lsbd2.sh to crontab
-echo "*/5 * * * * cd ~/recorder && bash RecRunner.sh &" >> /etc/crontab
-echo "50  * * * * bash ~/lsbd2.sh &" >> /etc/crontab
+# Add RecRunner.sh and lsbd2.sh to crontab
+echo "@reboot wrirops cd ~/recorder && bash RecRunner.sh &" >> /etc/crontab
+echo "50  * * * * wrirops bash ~/lsbd2.sh &" >> /etc/crontab
 
 # Set up firewall
 ufw enable

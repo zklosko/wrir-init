@@ -1,14 +1,11 @@
 #!/bin/bash
 
-cd scripts
-
 #Pull schedule on script start, pass to publish directory for json container
 bash ./getsched17.sh  #removed & from command
 
 while true
 do
   date -R
-  cd /scripts
   
   bash ./whatson4.sh &  # sending to background
   bash ./posted.sh &
