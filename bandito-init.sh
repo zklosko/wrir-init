@@ -13,7 +13,7 @@ apt update -y && apt install ffmpeg tzdata procps id3v2 \
 cp icecast.xml /etc/icecast2/
 
 # For the stream recorder
-cp recorder ~/
+cp -r recorder ~/
 
 # For Apache
 cp htdocs/index.html /var/www/html/index.html
