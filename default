@@ -1,12 +1,17 @@
 server {
     listen   80;
-    server_name  localhost;
+    server_name  files.wrir.org;
     access_log  /var/log/nginx/access.log;
 
     location / {
         root /srv/static;
         autoindex on;
         index index.html index.htm;
+    }
+    
+    location /shows {
+    	root /recorder/publish;
+    	autoindex on;
     }
 
     location ~ ^/cgi-bin {

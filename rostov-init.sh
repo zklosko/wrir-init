@@ -10,12 +10,12 @@ apt update -y && apt install ffmpeg tzdata procps id3v2 \
 # 2. Copy files
 
 # For the stream recorder
-cp recorder ~/
+cp -avr recorder /
 
 # For Apache (WebDAV)
-cp conf-available/dav.conf /etc/apache2/conf-available/dav.conf
-cp sites-available /etc/apache2/sites-available
-cp user.passwd /
+cp -av conf-available/dav.conf /etc/apache2/conf-available/dav.conf
+cp -avr sites-available /etc/apache2/sites-available
+cp -av user.passwd /
 
 cp guides /var/lib/dav/data
 
@@ -23,15 +23,15 @@ cp guides /var/lib/dav/data
 
 cd /var/lib/dav/data/ && mkdir Y && mkdir Z
 
-touch ~/.smbcredentials && \
-  echo -e 'username=rfrdj\npassword=wwr4trou\ndomain=wrir.local' > ~/.smbcredentials
+touch /.smbcredentials && \
+  echo -e 'username=rfrdj\npassword=wwr4trou\ndomain=wrir.local' > ~.smbcredentials
 
-echo "//192.168.200.16/shared ~/Y cifs credentials=/home/wrirops/.smbcredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
-echo "//192.168.200.23/z ~/Z cifs credentials=/home/wrirops/.smbcredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
+echo "//192.168.200.16/shared /var/lib/dav/data/Y cifs credentials=/.smbcredentials,vers=1.0,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
+echo "//192.168.200.23/z /var/lib/dav/data/Z cifs credentials=/.smbcredentials,vers=1.0,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
 
 mount -a
 
-echo "*/5 * * * * cd ~/recorder && bash RecRunner.sh &" >> /etc/crontab
+echo "*/5 * * * * root bash /recorder/RecRunner.sh &" >> /etc/crontab
 
 ufw enable
 ufw allow 22,443/tcp

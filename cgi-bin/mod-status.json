@@ -3,4 +3,4 @@
 echo "Content-type: application/json"
 echo "Access-Control-Allow-Origin: *"
 echo
-wget -O - http://modmon/status.json  # refacture in case of broken DNS
+wget -O - http://192.168.200.22/status.json
