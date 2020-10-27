@@ -2,7 +2,7 @@
 #install to cgi-bin for httpd /usr/local/cgi-bin/web80/
 #ptaffs April 2014. wrir.org 97.3lpfm RVA
 
-sDB="$(ls /usr/local/apache2/htdocs/*.lsdb|tail -1)"  # same dir as html error page
+sDB="$(ls /src/static/*.lsdb|tail -1)"  # same dir as html error page
 
 sFilter="|"
 
