@@ -2,10 +2,12 @@
 
 #Pull schedule on script start, pass to publish directory for json container
 bash ./getsched17.sh  #removed & from command
+cd /recorder
 
 while true
 do
   date -R
+  cd /recorder
   
   bash ./whatson4.sh &  # sending to background
   bash ./posted.sh &

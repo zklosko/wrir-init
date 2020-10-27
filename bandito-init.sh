@@ -10,20 +10,20 @@ apt update -y && apt install ffmpeg tzdata procps id3v2 \
 # 2. Copy files
 
 # For Icecast
-cp icecast.xml /etc/icecast2/
+cp -av icecast.xml /etc/icecast2/
 
 # For the stream recorder
-cp -avr recorder/ ~/
+cp -avr recorder ~
 
 # For Apache
-cp -avr html/ /var/www/html/
+cp -avr html/*.* /var/www/html/
 cp -avr cgi-bin/ /usr/local/cgi-bin/
 cp -avr apache2/ /etc/apache2/
 
 # 3. Initialize setup
 
 # Attach network drives
-cd ~ && mkdir Y && mkdir Z
+mkdir ~/Y && mkdir ~/Z
 
 touch ~/.smbcredentials && \
   echo -e 'username=rfrdj\npassword=wwr4trou\ndomain=wrir.local' > ~/.smbcredentials
