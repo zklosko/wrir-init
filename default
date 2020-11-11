@@ -5,13 +5,11 @@ server {
 
     location / {
         root /srv/static;
-        autoindex on;
         index index.html index.htm;
     }
     
     location /shows {
     	root /recorder/publish;
-    	autoindex on;
     }
 
     location ~ ^/cgi-bin {
