@@ -1,15 +1,12 @@
 #!/bin/bash
 
 #Pull schedule on script start, pass to publish directory for json container
-cd /recorder
 mkdir publish && mkdir archive && mkdir raw
 bash ./getsched17.sh  #removed & from command
 
 while true
 do
   date -R
-  cd /recorder
-  
   bash ./whatson4.sh &  # sending to background
   bash ./posted.sh &
   bash ./getInfo2.sh &
@@ -20,7 +17,7 @@ do
   if [[ ${sMinuteHand} -eq 50 ]]  # was if [[ 10${sMinuteHand} -eq 50 ]]
   then
     bash ./getsched17.sh &
-    bash ./Cleaner.sh &
+    #bash ./Cleaner.sh &
   fi
 
   #Recheck at top of minute xx:xx:00

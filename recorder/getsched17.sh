@@ -30,7 +30,6 @@ fi
 sCSV="$(mktemp)"
 sCSV=$$.tmp
 
-#if ! curl -s http://www.wrir.org/generate-schedule-csv > "${sCSV}"
 if ! curl -s https://www.wrir.org/generate-schedule-csv > "${sCSV}"
 then
   echo CURL failed
