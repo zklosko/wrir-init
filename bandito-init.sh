@@ -13,8 +13,8 @@ cp -av icecast.xml /etc/icecast2/
 cp -avr recorder /
 
 # For Nginx
-cp -avr html/*.* /srv/static
-cp -avr cgi-bin/*.* /srv/cgi-bin/
+cp -avr html/* /srv/static
+cp -avr cgi-bin/* /srv/cgi-bin/
 cp -av default /etc/nginx/sites-configured/
 
 # 3. Initialize setup
@@ -30,9 +30,8 @@ echo "//192.168.200.23/z /Z cifs credentials=/.smbcredentials,vers=1.0,iocharset
 
 mount -a
 
-# Add RecRunner.sh and lsbd2.sh to crontab
+# Add RecRunner.sh to crontab
 echo "@reboot root bash /recorder/RecRunner.sh &" >> /etc/crontab
-echo "50  * * * * root bash /recorder/lsbd2.sh &" >> /etc/crontab
 
 # Set up firewall
 ufw enable

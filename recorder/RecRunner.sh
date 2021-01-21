@@ -6,6 +6,7 @@ bash ./getsched17.sh  #removed & from command
 
 while true
 do
+  cd /recorder
   date -R
   bash ./whatson4.sh &  # sending to background
   bash ./posted.sh &
@@ -17,6 +18,7 @@ do
   if [[ ${sMinuteHand} -eq 50 ]]  # was if [[ 10${sMinuteHand} -eq 50 ]]
   then
     bash ./getsched17.sh &
+    bash ./lsdb2.sh &
     #bash ./Cleaner.sh &
   fi
 
