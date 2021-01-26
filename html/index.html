@@ -1,12 +1,67 @@
+<!DOCTYPE html>
 <html>
-  <head>
-  
-  </head>
-  <body>
-    <h1>401 Error</h1>
-    <p>
-    <img src="/401.jpg" alt="401 Error from HTTP Status Dogs">
-    <p>
-      Sorry, but ordinary folk can't access this area. Need help? Email <a href="mailto:operations@wrir.org">operations@wrir.org</a> or submit a ticket at <a href="https://www.wrir.org/help">wrir.org/help</a>.
-  </body>
+    <head>
+        <title>WRIR Show Archive</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.6/dist/handlebars.min.js"></script>
+    </head>
+    <body>
+        <section class="hero">
+            <div class="hero-body">
+              <div class="container">
+                <h1 class="title">
+                  WRIR Show Archives
+                </h1>
+                <h2 class="subtitle">
+                    Use the buttons to the right of the show list to download each episode.
+                    Use CTRL/CMD + F to find a specific show. Episodes that aired more than 90 days ago
+                    can be found on the Z drive.
+                </h2>
+              </div>
+            </div>
+        </section>
+        <div id="showsList" class="container">
+            <script id="showsTemp" type="text/x-handlebars-template">
+                <table class="table is-narrow is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Show</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each this}}
+                        <tr>
+                            <th>{{dateunix}}</th>
+                            <th>{{{title}}}</th>
+                            <th><a href="{{mp3}}"><button class="button m-1 is-success">Download MP3</button></a> <a href="{{oga}}"><button class="button m-1 is-info">Download OGG</button></a></th>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </script>
+        </div>
+        <script>
+            async function getShows(){
+                let dataReq = await fetch('http://files.wrir.org/cgi-bin/showlist9');
+                let data = await dataReq.json();
+
+                if (!dataReq.ok){
+                    alert('Page down. Please reload and contact Operations if problem persists.');
+                } else{
+                    data.forEach(element => {
+                        element.dateunix = element.dateunix.slice(0, 16);  // Removing time zone and year from data
+                    });
+
+                    // Handlebars templating
+                    let temp = document.querySelector('#showsTemp').innerHTML;
+                    let hbTemp = Handlebars.compile(temp);
+                    let compiledHTML = hbTemp(data);
+                    document.querySelector('#showsList').innerHTML = compiledHTML;
+                }
+            };
+            getShows();
+        </script>
+    </body>
 </html>
