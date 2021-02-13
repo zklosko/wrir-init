@@ -3,7 +3,7 @@
 #ptaffs April 2014. wrir.org 97.3lpfm RVA
 #json version
 
-sMediaPath=/recorder/publish  # was /var/www/web1/storage/ShowArchive/
+sMediaPath=/srv/static/shows  # was /var/www/web1/storage/ShowArchive/
 sFirst=0
 
 sType="all"

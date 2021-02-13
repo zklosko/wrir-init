@@ -5,10 +5,10 @@ ps -ef | grep -v $$ | grep -q $0 && exit
 
 sWorkDir=${PWD}
 # make working folder if not present
-[[ ! -d ${sWorkDir}/publish ]] && mkdir ${sWorkDir}/publish
+# [[ ! -d ${sWorkDir}/publish ]] && mkdir ${sWorkDir}/publish
 [[ ! -d ${sWorkDir}/archive ]] && mkdir ${sWorkDir}/archive
 
-sDest=${PWD}/publish
+sDest=/srv/static/shows
 sMinFree=97
 
 echo Start $0 $(date)
@@ -33,8 +33,8 @@ while read sFile ; do
     sShowYr=${sFile:0:4}
     sShowMo=${sFile:4:2}
     sShowDn=${sFile:6:2}
-    mkdir -p "/Z/AUDIO ARCHIVES/test/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
-    if cp ${sFN}.mp3 "/Z/AUDIO ARCHIVES/test/ShowArchive/${sShowYr}/${sShowMo}/${sShowDn}"
+    mkdir -p "/Z/AUDIO ARCHIVES/ShowArchive/${sShowYr}/${sShowMo}"
+    if cp ${sFN}.mp3 "/Z/AUDIO ARCHIVES/ShowArchive/${sShowYr}/${sShowMo}"
     then
       echo Archive good
     else

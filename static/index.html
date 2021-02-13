@@ -35,7 +35,7 @@
                         <tr>
                             <th>{{dateunix}}</th>
                             <th>{{{title}}}</th>
-                            <th><a href="{{mp3}}"><button class="button m-1 is-success">Download MP3</button></a> <a href="{{oga}}"><button class="button m-1 is-info">Download OGG</button></a></th>
+                            <th><a href="{{mp3}}"><button class="button m-1 is-success">Download MP3</button></a></th>
                         </tr>
                         {{/each}}
                     </tbody>
@@ -44,12 +44,12 @@
         </div>
         <script>
             async function getShows(){
-                let dataReq = await fetch('http://files.wrir.org/cgi-bin/showlist9');
+                let dataReq = await fetch('https://vault.wrir.org/cgi-bin/showlist9');
                 let data = await dataReq.json();
 
                 if (!dataReq.ok){
                     alert('Page down. Please reload and contact Operations if problem persists.');
-                } else{
+                } else {
                     data.forEach(element => {
                         element.dateunix = element.dateunix.slice(0, 16);  // Removing time zone and year from data
                     });

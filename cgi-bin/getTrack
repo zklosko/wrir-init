@@ -1,0 +1,64 @@
+#!/bin/bash
+
+
+sDB="${1:0:7}"
+sTrk="${2}"
+
+[[ ${#1} -eq 7 ]] || exit 1
+
+[[ -f "/srv/static/${sDB}.lsdb" ]] || exit 1  # refactored
+
+sDBF=/srv/static/${sDB}.lsdb  # refactored
+
+sMedia="/Y/DIGITAL MUSIC LIBRARY/LiveMusic/"  # refactored
+sSong=$(grep "^${sTrk}|" ${sDBF}|tail -1|cut -f6,7 -d'|' --output-delimiter='/') 
+
+sLog=/var/tmp/$(date "+%Y%m%d%H%M%S").$$
+
+sMIME="audio/mpeg"
+
+#sFile=$(printf '%q' "${sMedia}/${sSong}")
+sFile="${sMedia}/${sSong}"
+
+set > ${sLog}
+
+if [[ -f "${sFile}" ]]; then
+  sCopyRange=""
+  sSize=$(stat --printf="%s" "${sFile}")
+  if [[ ! -z "${HTTP_RANGE-}" ]]
+  then
+    sRange=${HTTP_RANGE%=*}
+    sValue=${HTTP_RANGE#*=}
+    sVL=${sValue%-*}
+    sVH=${sValue#*-}
+    [[ -z ${sVH} ]] && sVH=$(( sSize - 1 ))
+    if [[ "${sRange}" = "bytes" ]] && [[ ${sVL} -lt ${sSize} ]] && \
+	 [[ ${sVL} -lt ${sVH} ]] && [[ ${sVH} -le ${sSize} ]]
+    then
+	sCopyRange="iflag=skip_bytes,count_bytes skip=${sVL} count=$((sVH-sVL+1))" 
+#	sCopyRange="ibs=1 skip=${sVL} count=$((sVH-sVL+1))" 
+    fi  
+    [[ ${HTTP_RANGE} = "bytes=0-" ]] && sCopyRange=""
+  fi
+  echo "Access-Control-Allow-Origin: *"
+  echo "Content-Type: ${sMIME}"
+  echo "Date: $(date -R)"
+  sLM=$(stat --printf="%y" "${sFile}")
+  echo "Last-Modified: ${sLM}"
+  sName=$(basename "${sFile}")
+  echo "ETag: \"${sName}\""
+#  echo "Content-Disposition: filename=\"$(basename ${sFile})\""
+#  echo "Content-Transfer-Encoding: binary"
+  echo "Accept-Ranges: bytes"
+  if [[ -z ${sCopyRange} ]]; then
+    echo "Content-Length: ${sSize}"
+  else
+    echo "Status: 206 Partial Content"
+    echo "Expires: $(date -R -d tomorrow)"
+    echo "Content-Length: $((sVH-sVL+1))"
+    echo "Content-Range: bytes ${sVL}-${sVH}/${sSize}"
+  fi
+  echo ""
+  echo "${HTTP_RANGE} ${sCopyRange}" >> ${sLog}
+  dd if="${sFile}" ${sCopyRange} 2>> ${sLog}
+fi

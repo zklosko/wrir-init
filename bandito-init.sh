@@ -13,9 +13,9 @@ cp -av icecast.xml /etc/icecast2/
 cp -avr recorder /
 
 # For Nginx
-cp -avr html/* /srv/static
-cp -avr cgi-bin/* /srv/cgi-bin/
-cp -av default /etc/nginx/sites-configured/
+# cp -avr html/* /srv/static
+# cp -avr cgi-bin/* /srv/cgi-bin/
+# cp -av default /etc/nginx/sites-configured/
 
 # 3. Initialize setup
 

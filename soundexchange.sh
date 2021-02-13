@@ -19,7 +19,7 @@
 
 sMounts=(WRIR96kbps wrir)
 
-sAnnaDate="2020-08-01"
+sAnnaDate="2021-02-01"
 
 sRangeStart=$(date "+%s" -d "${sAnnaDate}")
 sRangeEnd=$(date "+%s" -d "${sAnnaDate} + 14 days")

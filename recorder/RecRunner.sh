@@ -2,11 +2,11 @@
 
 #Pull schedule on script start, pass to publish directory for json container
 mkdir publish && mkdir archive && mkdir raw
-bash ./getsched17.sh  #removed & from command
+bash /srv/recorder/getsched17.sh  #removed & from command
 
 while true
 do
-  cd /recorder
+  cd /srv/recorder
   date -R
   bash ./whatson4.sh &  # sending to background
   bash ./posted.sh &
