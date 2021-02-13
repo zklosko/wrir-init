@@ -3,7 +3,7 @@
          on the server info page of the icecast web interface
          (server_version.xsl). -->
     <location>RVA, USA</location>
-    <admin>peter@wrir.org</admin>
+    <admin>operations@wrir.org</admin>
 
     <limits>
         <clients>50</clients>
@@ -30,7 +30,7 @@
         <!-- Sources log in with username 'source' -->
         <source-password>wwr4trou</source-password>
         <!-- Relays log in username 'relay' -->
-        <relay-password>hackmex200</relay-password>
+        <relay-password>wwr4trou</relay-password>
 
         <!-- Admin logs in with the username given below -->
         <admin-user>admin</admin-user>

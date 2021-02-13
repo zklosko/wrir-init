@@ -1,8 +1,7 @@
 # /bin/bash
 
 # 1. Install prereqs
-apt update -y && apt install ffmpeg tzdata procps id3v2 \
-  nginx fcgiwrap icecast2 cifs-utils winbind libnss-winbind -y
+apt update -y && apt install ffmpeg tzdata procps id3v2 apache2 icecast2 cifs-utils winbind libnss-winbind -y
 
 # 2. Copy files
 

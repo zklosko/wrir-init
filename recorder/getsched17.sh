@@ -124,5 +124,5 @@ else
   mv shows.$$ shows.txt
 fi
 
-cp -f showdata.txt ./publish  # updating showdata.txt file for files.wrir.org scripts
+cp -f showdata.txt /srv/static/shows  # updating showdata.txt file for files.wrir.org scripts
 

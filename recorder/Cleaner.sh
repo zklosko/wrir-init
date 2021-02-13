@@ -8,7 +8,7 @@ sOldFiles=$(find ./raw/* -ctime +${sDays})  # refractered line
 [[ -n "${sOldFiles}" ]] && rm ${sOldFiles}
 
 # Cleaning files in publish a.k.a. files.wrir.org/shows
-sDir="./publish"
+sDir="/srv/static/shows"
 
 echo "Starting $0 $(date)"
 

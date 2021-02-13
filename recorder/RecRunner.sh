@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#Pull schedule on script start, pass to publish directory for json container
-mkdir publish && mkdir archive && mkdir raw
-bash /srv/recorder/getsched17.sh  #removed & from command
+#Pull schedule on script start
+cd /srv/recorder
+mkdir archive && mkdir raw
+bash ./getsched17.sh  #removed & from command
 
 while true
 do
