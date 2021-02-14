@@ -3,8 +3,6 @@
 sRecPID=./
 sMe=whatson.pid
 
-sRecBinary=wget
-
 #kill any other instance of me, may have hung
 [[ -f ${sRecPID}/${sMe} ]] && kill $(<${sRecPID}/${sMe})
 echo $$ > ${sRecPID}/${sMe}
@@ -48,14 +46,14 @@ do
 # amend: check for first program of day being continuation from yesterday
     [[ "${sPrevStart}" = "0000" ]] && [[ "${sPrevTitle}" = "${sYLP}" ]] && sProg=$(date '+%Y%m%d' -d yesterday)${sYLS}
 # look for a wget recording that identity
-    if  ps -ef | grep -v grep | grep ${sRecBinary} | grep -q ${sProg} 
+    if  ps -ef | grep -v grep | grep wget | grep -q ${sProg} 
     then
 # found? Y Quit. this should occur very frequently
       echo Recording already
 # no: maybe it's a new program or the current recorder crashed
     else
 # remember an active wget recorder would have caused an exit earlier/already
-      sOutFile=${sSaveTo}/${sProg}-${sHour}-${sPrevTitle}.mp3
+      sOutFile=${sSaveTo}${sProg}-${sHour}-${sPrevTitle}.mp3
 # look for recorder running, there shouldn't be one. maybe caputure the PID, maybe from the command pattern
 # found one? kill it before starting new
       if [[ -f ${sRecPID}/RecPID ]] && ps -p $(<${sRecPID}/RecPID)
@@ -64,8 +62,8 @@ do
       fi
       echo $sProg > ${sSaveTo}/currentshow.txt
       #find any other wgets and kill them
-      #while sPIds=$(ps -f|grep -v grep|grep ${sRecBinary}) 
-      while sPIds=$(ps -C ${sRecBinary} -o pid=)
+      #while sPIds=$(ps -f|grep -v grep|grep wget) 
+      while sPIds=$(ps -C wget -o pid=)
       do kill $sPIds
       done
 # start new recorder for program identity, background it
