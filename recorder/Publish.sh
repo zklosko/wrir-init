@@ -3,7 +3,7 @@
 #Begin CopyToRAS.sh
 ps -ef | grep -v $$ | grep -q $0 && exit
 
-sWorkDir=${PWD}
+sWorkDir=/srv/recorder
 # make working folder if not present
 [[ ! -d ${sWorkDir}/archive ]] && mkdir ${sWorkDir}/archive
 
@@ -12,7 +12,7 @@ sMinFree=97
 
 echo Start $0 $(date)
 
-cd ./raw/
+cd /srv/recorder/raw/
 
 ls *.publish |
 while read sFile ; do

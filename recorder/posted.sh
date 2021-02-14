@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sWorkDir=${PWD}
+sWorkDir=/srv/recorder
 sPid=${sWorkDir}/me.pid
 
 if [[ -f ${sPid} ]] && ps -p $(< ${sPid} ) -f | grep $0
@@ -32,7 +32,7 @@ fi
 # Use a value of 0 for high quality, larger files, and 9 for smaller files of lower quality. 4 is the default.
 #In LAME, 0 specifies highest quality but is very slow, while 9 selects poor quality, but is fast.
 
-cd ./raw/
+cd /srv/recorder/raw/
 for sNew in $(ls *.new)
 do
   sFile=${sNew%%-*}
