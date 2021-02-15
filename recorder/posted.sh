@@ -60,7 +60,6 @@ do
     #sox "${sFile}-[0-2]*.mp3" -C3 ${sFile}.${sProg}.ogg  # soundexchange, was compressing files
     touch ${sFile}.${sProg}.publish
   fi
-  rm ${sNew}
   rm ${sFile}-[0-2]*.mp3
 done
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Begin CopyToRAS.sh
-ps -ef | grep -v $$ | grep -q $0 && exit
+#ps -ef | grep -v $$ | grep -q $0 && exit
 
 sWorkDir=/srv/recorder
 # make working folder if not present
@@ -22,7 +22,8 @@ while read sFile ; do
   sFN=${sFile%.publish}  # removes .publish from filename variable
   echo Publishing $sFN
   for sExt in mp3 ogg; do
-    if cp ${sFN}.${sExt} ${sDest} ; then  # copy mp3, ogg files to dest
+    if cp ${sFN}.${sExt} ${sDest}  # copy mp3, ogg files to dest
+    then
       echo Copy good
     else
       touch ${sFN}.${sExt}.error  # create showname.error file on copy error
@@ -37,7 +38,7 @@ while read sFile ; do
     then
       echo Archive good
     else
-      cp ${sFN}.mp3 sWorkDir/archive
+      cp ${sFN}.mp3 ${sWorkDir}/archive
       echo Archive error
     fi
   done

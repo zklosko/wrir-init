@@ -1,5 +1,5 @@
 #!/bin/bash
-ps -ef | grep -v $$ | grep -q $0 && exit
+#ps -ef | grep -v $$ | grep -q $0 && exit
 echo Start $0
 
 cd /srv/recorder/raw/
@@ -32,21 +32,22 @@ do
       wget -q "${sURL}" -O - | grep "myplaylist-blog-posts" | sed 's/<li/\n&/g' |grep -v myplaylist-post-list|
       while read sLine
       do
-		sTrim1="${sLine##*wrir.org/}"
-		sBlogDate=$(date "+%s" -d ${sTrim1:0:10})
-		sTitle1=${sTrim1#*>}
-		sTitle=${sTitle1%%<*}
+        sTrim1="${sLine##*wrir.org/}"
+        sBlogDate=$(date "+%s" -d ${sTrim1:0:10})
+        sTitle1=${sTrim1#*>}
+        sTitle=${sTitle1%%<*}
 
-		if true # [[ ${sBlogDate} -eq ${sShowEp} ]]  # info file not populated if condition is not met?
-		then
-		  sShowName=$(grep "^${sShowDy}|${sShowHr}|" ../showdata.txt|grep "${sURL}"|cut -f3 -d"|")
-		  sDisplayDate=$(date --date="@${sBlogDate}")
-		  sBlogURL1=${sLine##*a href=\"}
-		  sBlogURL=${sBlogURL1%%\"*}
-		  sPoster=$(wget -O - ${sBlogURL} |grep 'glyphicon glyphicon-user'|  grep -v meta|sed 's/[<|>]/|/g'|cut -f7 -d\|)
-		  echo "${sInfoFile%%.info}|${sDisplayDate}|${sShowName}|${sPoster}|${sTitle}|" > ${sInfoFile}  # error: info file is empty
-		fi
+        if true # [[ ${sBlogDate} -eq ${sShowEp} ]]  # info file not populated if condition is not met?
+        then
+          sShowName=$(grep "^${sShowDy}|${sShowHr}|" ../showdata.txt|grep "${sURL}"|cut -f3 -d"|")
+          sDisplayDate=$(date --date="@${sBlogDate}")
+          sBlogURL1=${sLine##*a href=\"}
+          sBlogURL=${sBlogURL1%%\"*}
+          sPoster=$(wget -O - ${sBlogURL} |grep 'glyphicon glyphicon-user'|  grep -v meta|sed 's/[<|>]/|/g'|cut -f7 -d\|)
+          echo "${sInfoFile%%.info}|${sDisplayDate}|${sShowName}|${sPoster}|${sTitle}|" > ${sInfoFile}  # error: info file is empty
+        fi
       done 
     done
   fi
+  rm ${sFile}  # should remove showname.new
 done
