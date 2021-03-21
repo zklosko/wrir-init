@@ -1,18 +1,26 @@
 #!/bin/bash
 
-#show in the form 201608121900 which is YYYYMMDDhhmm
-sShow=$(tr -d -c '[:digit:]' <<< "${1}")
-[[ ${#sShow} -eq 12 ]] || exit 1
 
-sType="mp3"
-sMType="mpeg"
-sMedia="/srv/static/shows"  # changed
+sDB="${1:0:7}"
+sTrk="${2}"
 
-#/var/www/web1/storage/ShowArchive/
-sFile=$(ls -1 ${sMedia}/${sShow}*.${sType})
+[[ ${#1} -eq 7 ]] || exit 1
 
+[[ -f "/var/www/data/${sDB}.lsdb" ]] || exit 1
 
-sMIME="audio/${sMType}"
+sDBF=/var/www/data/${sDB}.lsdb
+
+sMedia="/var/www/web1/storage/Y/DIGITAL MUSIC LIBRARY/LiveMusic/"
+sSong=$(grep "^${sTrk}|" ${sDBF}|tail -1|cut -f6,7 -d'|' --output-delimiter='/') 
+
+sLog=/var/tmp/$(date "+%Y%m%d%H%M%S").$$
+
+sMIME="audio/mpeg"
+
+#sFile=$(printf '%q' "${sMedia}/${sSong}")
+sFile="${sMedia}/${sSong}"
+
+set > ${sLog}
 
 if [[ -f "${sFile}" ]]; then
   sCopyRange=""
@@ -51,5 +59,6 @@ if [[ -f "${sFile}" ]]; then
     echo "Content-Range: bytes ${sVL}-${sVH}/${sSize}"
   fi
   echo ""
-  dd if="${sFile}" ${sCopyRange} 
+  echo "${HTTP_RANGE} ${sCopyRange}" >> ${sLog}
+  dd if="${sFile}" ${sCopyRange} 2>> ${sLog}
 fi
