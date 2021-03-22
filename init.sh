@@ -33,7 +33,10 @@ ufw allow 22,80,8000/tcp
 
 # Restart services
 systemctl restart apache2
+systemctl enable apache2
 systemctl restart icecast2
+systemctl enable icecast2
 systemctl restart cron
+systemctl enable cron
 
 echo 'All done!'
