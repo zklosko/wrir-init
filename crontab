@@ -25,3 +25,4 @@
 @reboot bash /srv/recorder/RecRunner.sh &
 0,30 * * * * bash /srv/recorder/RecRunner.sh &
 @daily bash /srv/recorder/lsdb2.sh &
+@monthly bash /srv/recorder/cleaner.sh &
