@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sDIR="/Y/DIGITAL MUSIC LIBRARY/LiveMusic/"
+sDIR="/srv/shares/Y/DIGITAL MUSIC LIBRARY/LiveMusic/"
 sLSDBFolder="/srv/static"
 
 sPrevDB=$(ls -1tr ${sLSDBFolder}/*.lsdb|tail -1)

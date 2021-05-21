@@ -2,7 +2,7 @@
 
 # 1. Install prereqs
 apt update
-apt install -y ffmpeg tzdata procps id3v2 apache2 icecast2 cifs-utils winbind libnss-winbind
+apt install -y ffmpeg tzdata procps id3v2 apache2 icecast2 nfs-common
 
 # 2. Copy files
 
@@ -16,11 +16,10 @@ cp -avr srv/* /srv
 # 3. Initialize setup
 
 # Attach network drives
-mkdir /Y && mkdir /Z
-
-echo -e 'username=rfrdj\npassword=wwr4trou\ndomain=wrir.local' >> /.smbcredentials
-echo "//192.168.200.16/shared /Y cifs credentials=/.smbcredentials,vers=1.0,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
-echo "//192.168.200.23/z /Z cifs credentials=/.smbcredentials,vers=1.0,iocharset=utf8,gid=1000,uid=1000,file_mode=0777,dir_mode=0777 0 0 " >> /etc/fstab
+mkdir /srv/shares/Y
+mkdir /srv/shares/Z
+echo "192.168.200.16:/volume1/shared    /srv/shares/Y   nfs auto,nofail,noatime,nolock,intr,tcp 0 0" >> /etc/fstab
+echo "192.168.200.23:/volume1/z    /srv/shares/Z   nfs auto,nofail,noatime,nolock,intr,tcp 0 0" >> /etc/fstab
 
 mount -a
 
@@ -29,7 +28,7 @@ cat crontab > /etc/crontab
 
 # Set up firewall
 ufw enable
-ufw allow 22,80,8000/tcp
+ufw allow 22,80,443,8000/tcp
 
 # Restart services
 systemctl restart apache2
