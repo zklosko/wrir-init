@@ -1,0 +1,20 @@
+<div class="container">
+    <table class="table is-narrow is-hoverable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Show</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each show}}
+            <tr>
+                <th>{{dateunix}}</th>
+                <th>{{{title}}}</th>
+                <th><a href="{{mp3}}"><button class="button m-1 is-success">Download MP3</button></a></th>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

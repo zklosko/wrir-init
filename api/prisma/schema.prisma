@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model shows {
+  title     String
+  show      String?
+  datestamp Int  @id
+  dateunix  DateTime
+  mp3       String @unique
+  type      String
+  showurl   String
+  poster    String
+}
+
+model schedule {
+  weekday       String
+  startTime     Int
+  showName      String
+  showNameFormal String
+  type          String  @default("other")
+  dj            String?
+  showURL       String?
+  showIcon      String?
+  showIcon2     String?
+
+  @@id(fields: [weekday, startTime], name: "showID")
+}
+
+model livemusic {
+  artist   String?
+  trackno  String?
+  title    String?
+  show     String?
+  date     DateTime
+  filetime String?
+  genre    String? @default("None")
+  id       Int     @id @default(autoincrement())
+  fpath    String
+}
