@@ -37,7 +37,7 @@ model livemusic {
   trackno  String?
   title    String?
   show     String?
-  date     DateTime
+  date     String?
   filetime String?
   genre    String? @default("None")
   id       Int     @id @default(autoincrement())

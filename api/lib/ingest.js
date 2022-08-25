@@ -76,7 +76,7 @@ result.forEach(async(file) => {
         
         if (progMode === 'music') {
             // need to find way to get filepath with extension without directories (as seen on server)
-            filename = tags.artist + '/' + tags.title + '.mp3'
+            filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
             uploadMedia('livemusic', filename, file)
 
             // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
