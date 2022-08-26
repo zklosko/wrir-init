@@ -37,13 +37,13 @@ async function main(deletionDate) {
         try {
             minioClient.removeObject('shows', filename, (e) => {
                 if (e) {
-                    console.log('Unable to delete ' + e)
+                    console.log('Unable to delete ' + filename + '\n' + e)
                 } else {
                     deleteShowFromDB(el)
                 }
             })
         } catch(err) {
-            console.error(error)
+            console.error(err)
         } finally {
             console.log('Show removed: ' + filename + '\n')
         }
