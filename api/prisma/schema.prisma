@@ -40,6 +40,5 @@ model livemusic {
   date     String?
   filetime String?
   genre    String? @default("None")
-  id       Int     @id @default(autoincrement())
-  fpath    String
+  fpath    String  @id
 }

@@ -24,6 +24,15 @@ const minioClient = new Minio.Client({
     secretKey: process.env.MINIO_SECRET_KEY
 });
 
+program
+    .version('0.0.2')
+    .requiredOption('-f, --filepath <type>', 'directory to import')
+    .option('-s --single', 'upload single file')
+    .option('-m --music', 'upload to performances archive (uploads to show archive by default)')
+
+program.parse();
+const options = program.opts()
+
 function uploadMedia(bucket, filename, filepath) {
     minioClient.fPutObject(bucket, filename, filepath, function (err, etag) {
         if (err)
@@ -31,17 +40,6 @@ function uploadMedia(bucket, filename, filepath) {
         console.log('File ' + filename + ' uploaded successfully');
     });
 }
-
-program
-    .version('0.0.1')
-    .option('-l, --library <type>', 'kind of media to import (music, shows)')
-    .option('-f, --filepath <type>', 'directory to import')
-
-program.parse();
-const dirPath = program.opts().filepath
-const progMode = program.opts().library
-if (!program.opts().filepath || !program.opts().library || (program.opts().library != 'music' && program.opts().library != 'shows') ) { process.exit(1) }
-
 
 function getAllFiles(dirPath, filesArray) {
     // dirPath: str, filesArray: array
@@ -65,64 +63,73 @@ function getAllFiles(dirPath, filesArray) {
     return filesArray;
 }
 
-const result = getAllFiles(dirPath)
+function main() {
+    let result = []
+    if (options.single) {
+        result.push(options.filepath)
+    } else {
+        result = getAllFiles(options.filepath)
+    }
 
-result.forEach(async(file) => {
-    try {
-        let fileURL, filename, showWeekday, showData, urlPrefix
-        const tags = NodeID3.read(file)
-
-        urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
-        
-        if (progMode === 'music') {
-            // need to find way to get filepath with extension without directories (as seen on server)
-            filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
-            uploadMedia('livemusic', filename, file)
-
-            // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
-            fileURL =  urlPrefix + 'livemusic/' + filename
-            await prisma.livemusic.create({
-                data: {
-                    title: tags.title,
-                    artist: tags.artist,
-                    show: tags.album,
-                    date: tags.year,
-                    filetime: dayjs(fs.statSync(file).ctime).format(),
-                    genre: tags.genre,
-                    trackno: tags.trackNumber,
-                    fpath: fileURL,
-                }
-            });        
-
-        } else if (progMode === 'shows') {
-            let filenameArray = file.split("/")
-            filename = filenameArray[filenameArray.length - 1]  // get last part
-
-            showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
-
-            showData = await prisma.schedule.findUnique({
-                where: {
-                    showID: {
-                        weekday: showWeekday,
-                        startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
+    result.forEach(async(file) => {
+        try {
+            let fileURL, filename, showWeekday, showData, urlPrefix
+            const tags = NodeID3.read(file)
+    
+            urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
+            
+            if (options.music) {
+                // need to find way to get filepath with extension without directories (as seen on server)
+                filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
+                uploadMedia('livemusic', filename, file)
+    
+                // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
+                fileURL =  urlPrefix + 'livemusic/' + filename
+                await prisma.livemusic.create({
+                    data: {
+                        title: tags.title,
+                        artist: tags.artist,
+                        show: tags.album,
+                        date: tags.year,
+                        filetime: dayjs(fs.statSync(file).ctime).format(),
+                        genre: tags.genre,
+                        trackno: tags.trackNumber,
+                        fpath: fileURL,
                     }
-                },    
-            })
-            uploadMedia('shows', filename, file)
+                });        
+    
+            } else {
+                let filenameArray = file.split("/")
+                filename = filenameArray[filenameArray.length - 1]  // get last part
+    
+                showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
+    
+                showData = await prisma.schedule.findUnique({
+                    where: {
+                        showID: {
+                            weekday: showWeekday,
+                            startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
+                        }
+                    },    
+                })
+                uploadMedia('shows', filename, file)
+    
+                await prisma.shows.create({
+                    data: {
+                        title: showData.showNameFormal,
+                        show: showData.showName,
+                        datestamp: filename.slice(0,12),
+                        dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
+                        mp3: urlPrefix + 'shows/' + filename,
+                        // ogg: ...,
+                        type: showData.type,
+                        showurl: showData.showURL,
+                        poster: showData.showIcon
+                    }
+                })
+            }
+        } catch (err) { console.log(err) }
+    })
+}
 
-            await prisma.shows.create({
-                data: {
-                    title: showData.showNameFormal,
-                    show: showData.showName,
-                    datestamp: filename.slice(0,12),
-                    dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
-                    mp3: urlPrefix + 'shows/' + filename,
-                    // ogg: ...,
-                    type: showData.type,
-                    showurl: showData.showURL,
-                    poster: showData.showIcon
-                }
-            })
-        }
-    } catch (err) { console.log(err) }
-})
+main()
