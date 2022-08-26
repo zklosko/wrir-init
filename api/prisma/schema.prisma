@@ -10,8 +10,8 @@ datasource db {
 model shows {
   title     String
   show      String?
-  datestamp Int  @id
-  dateunix  DateTime
+  datestamp String
+  dateunix  DateTime @id
   mp3       String @unique
   type      String
   showurl   String

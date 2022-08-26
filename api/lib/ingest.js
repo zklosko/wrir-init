@@ -96,8 +96,7 @@ result.forEach(async(file) => {
 
         } else if (progMode === 'shows') {
             let filenameArray = file.split("/")
-            filename = filenameArray[filenameArray.length - 1]  // get last part of plit
-            let datestamp = parseInt(filename.slice(0,12))
+            filename = filenameArray[filenameArray.length - 1]  // get last part
 
             showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
 
@@ -109,14 +108,13 @@ result.forEach(async(file) => {
                     }
                 },    
             })
-
             uploadMedia('shows', filename, file)
 
             await prisma.shows.create({
                 data: {
                     title: showData.showNameFormal,
                     show: showData.showName,
-                    datestamp: datestamp,
+                    datestamp: filename.slice(0,12),
                     dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
                     mp3: urlPrefix + 'shows/' + filename,
                     // ogg: ...,

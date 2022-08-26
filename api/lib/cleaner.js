@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
@@ -5,58 +6,48 @@ const dayjs = require('dayjs');
 var customParseFormat = require('dayjs/plugin/customParseFormat')
 dayjs.extend(customParseFormat)
 
-const objStorURL = env("MINIO_URL")
+const objStorURL = process.env.MINIO_URL
 const Minio = require('minio');
 const minioClient = new Minio.Client({
     endPoint: objStorURL,
     port: 9000,
     useSSL: false,
-    accessKey: env("MINIO_ACCESS_KEY"),
-    secretKey: env("MINIO_SECRET_KEY")
+    accessKey: process.env.MINIO_ACCESS_KEY,
+    secretKey: process.env.MINIO_SECRET_KEY
 });
 
-const deleteOlderThan = 90  // days
-const deletionDate = parseInt(dayjs().subtract(deleteOlderThan, 'day').format('YYYYMMDD'))
+const deleteOlderThan = 30  // days
+const deletionDate = dayjs().subtract(deleteOlderThan, 'day').toISOString()
 
-async function getDeletionList(deletionDate) {
-    let list = await prisma.shows.findMany({
+async function deleteShowFromDB(el) {
+    await prisma.shows.delete({
         where: {
-            datestamp: {
-                lte: deletionDate
-            }
-        },
-        select: {
-            datestamp: true,
-            showName: true
-        }
-    });
-
-    return list;
-}
-
-let deletionList = getDeletionList(deletionDate)
-
-deletionList.forEach(async(el) => {
-    let fileName = toString(el.datestamp) + el.showName + '.mp3'
-
-    minioClient.removeObject('shows', fileName, (e) => {
-        if (e) {
-            console.log('Unable to delete ' + e)
-        } else {
-            // todo: delete from database
-            await prisma.shows.delete({
-                where: {
-                    datestamp: el.datestamp,
-                    showName: el.showName
-                }
-            })
+            dateunix: el.dateunix
         }
     })
-    
-})
+}
 
-console.log('Done! Files removed: \n')
-deletionList.forEach(el => {
-    console.log(el + '\n')
-});
-console.log('==================')
+async function main(deletionDate) {
+    let list = await prisma.$queryRaw`select mp3, dateunix from shows where dateunix < ${deletionDate}::timestamp;`
+
+    list.forEach(el => {
+        let filenameArray = el.mp3.split("/")
+        let filename = filenameArray[filenameArray.length - 1]  // get last part
+        
+        try {
+            minioClient.removeObject('shows', filename, (e) => {
+                if (e) {
+                    console.log('Unable to delete ' + e)
+                } else {
+                    deleteShowFromDB(el)
+                }
+            })
+        } catch(err) {
+            console.error(error)
+        } finally {
+            console.log('Show removed: ' + filename + '\n')
+        }
+    })
+}
+
+main(deletionDate)
