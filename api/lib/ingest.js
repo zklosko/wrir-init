@@ -80,6 +80,8 @@ function main() {
             
             if (options.music) {
                 // need to find way to get filepath with extension without directories (as seen on server)
+                if (!tags.artist) { tags.artist = 'Unknown' }
+                if (!tags.title) {tags.title = tags.trackNumber}
                 filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
                 uploadMedia('livemusic', filename, file)
     

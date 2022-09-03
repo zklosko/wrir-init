@@ -69,15 +69,17 @@ app.get('/livesound', async (req, res) => {
 
 app.get('/livebands', async (req, res) => {
     const bandlist = await prisma.livemusic.findMany({
+        distinct: ['artist'],
         select: {
             artist: true
         }
     })
-    res.json(_.chain(bandlist).uniq().sortBy().value())
+    res.json(bandlist)
 })
 
 app.get('/livegenre', async (req, res) => {
     const genrelist = await prisma.livemusic.findMany({
+        distinct: ['genre'],
         select: {
             genre: true
         }
