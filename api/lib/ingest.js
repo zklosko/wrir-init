@@ -6,6 +6,7 @@ const path = require('path');
 require('dotenv').config();
 const { program } = require('commander');
 const NodeID3 = require('node-id3');
+var progressBar = require('progress');
 
 const dayjs = require('dayjs');
 var customParseFormat = require('dayjs/plugin/customParseFormat')
@@ -37,7 +38,8 @@ function uploadMedia(bucket, filename, filepath) {
     minioClient.fPutObject(bucket, filename, filepath, function (err, etag) {
         if (err)
             return console.log(err);
-        console.log('File ' + filename + ' uploaded successfully');
+        // console.log('File ' + filename + ' uploaded successfully');
+        uploadBar.tick()
     });
 }
 
@@ -63,30 +65,47 @@ function getAllFiles(dirPath, filesArray) {
     return filesArray;
 }
 
-function main() {
-    let result = []
-    if (options.single) {
-        result.push(options.filepath)
-    } else {
-        result = getAllFiles(options.filepath)
-    }
+let result = []
+let numFiles
+if (options.single) {
+    result.push(options.filepath)
+    numFiles = 1
+} else {
+    result = getAllFiles(options.filepath)
+    numFiles = result.length
+    console.log('\n')
+}
 
-    result.forEach(async(file) => {
-        try {
-            let fileURL, filename, showWeekday, showData, urlPrefix
-            const tags = NodeID3.read(file)
-    
-            urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
-            
-            if (options.music) {
-                // need to find way to get filepath with extension without directories (as seen on server)
-                if (!tags.artist) { tags.artist = 'Unknown' }
-                if (!tags.title) {tags.title = tags.trackNumber}
-                filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
-                uploadMedia('livemusic', filename, file)
-    
-                // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
-                fileURL =  urlPrefix + 'livemusic/' + filename
+var dbBar = new progressBar('inserting into database [:bar] :current/:total', { 
+    total: numFiles,
+    complete: '=',
+    incomplete: ' ',
+    width: 20
+})
+var uploadBar = new progressBar('uploading files [:bar] :current/:total', { 
+    total: numFiles,
+    complete: '=',
+    incomplete: ' ',
+    width: 20
+})
+
+result.forEach(async(file) => {
+    try {
+        let fileURL, filename, showWeekday, showData, urlPrefix
+        const tags = NodeID3.read(file)
+
+        urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
+        
+        if (options.music) {
+            // need to find way to get filepath with extension without directories (as seen on server)
+            if (!tags.artist) { tags.artist = 'Unknown' }
+            if (!tags.title) {tags.title = tags.trackNumber}
+            filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
+            uploadMedia('livemusic', filename, file)
+
+            // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
+            fileURL =  urlPrefix + 'livemusic/' + filename
+            try{
                 await prisma.livemusic.create({
                     data: {
                         title: tags.title,
@@ -98,40 +117,40 @@ function main() {
                         trackno: tags.trackNumber,
                         fpath: fileURL,
                     }
-                });        
-    
-            } else {
-                let filenameArray = file.split("/")
-                filename = filenameArray[filenameArray.length - 1]  // get last part
-    
-                showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
-    
-                showData = await prisma.schedule.findUnique({
-                    where: {
-                        showID: {
-                            weekday: showWeekday,
-                            startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
-                        }
-                    },    
-                })
-                uploadMedia('shows', filename, file)
-    
-                await prisma.shows.create({
-                    data: {
-                        title: showData.showNameFormal,
-                        show: showData.showName,
-                        datestamp: filename.slice(0,12),
-                        dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
-                        mp3: urlPrefix + 'shows/' + filename,
-                        // ogg: ...,
-                        type: showData.type,
-                        showurl: showData.showURL,
-                        poster: showData.showIcon
-                    }
-                })
-            }
-        } catch (err) { console.log(err) }
-    })
-}
+                });     
+            } finally {
+                dbBar.tick()
+            }   
 
-main()
+        } else {
+            let filenameArray = file.split("/")
+            filename = filenameArray[filenameArray.length - 1]  // get last part
+
+            showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
+
+            showData = await prisma.schedule.findUnique({
+                where: {
+                    showID: {
+                        weekday: showWeekday,
+                        startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
+                    }
+                },    
+            })
+            uploadMedia('shows', filename, file)
+
+            await prisma.shows.create({
+                data: {
+                    title: showData.showNameFormal,
+                    show: showData.showName,
+                    datestamp: filename.slice(0,12),
+                    dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
+                    mp3: urlPrefix + 'shows/' + filename,
+                    // ogg: ...,
+                    type: showData.type,
+                    showurl: showData.showURL,
+                    poster: showData.showIcon
+                }
+            })
+        }
+    } catch (err) { console.log(err) }
+})
