@@ -105,7 +105,7 @@ result.forEach(async(file) => {
 
             // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
             fileURL =  urlPrefix + 'livemusic/' + filename
-            try{
+            try {
                 await prisma.livemusic.create({
                     data: {
                         title: tags.title,
@@ -137,20 +137,22 @@ result.forEach(async(file) => {
                 },    
             })
             uploadMedia('shows', filename, file)
-
-            await prisma.shows.create({
-                data: {
-                    title: showData.showNameFormal,
-                    show: showData.showName,
-                    datestamp: filename.slice(0,12),
-                    dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
-                    mp3: urlPrefix + 'shows/' + filename,
-                    // ogg: ...,
-                    type: showData.type,
-                    showurl: showData.showURL,
-                    poster: showData.showIcon
-                }
-            })
+            
+            try {
+                await prisma.shows.create({
+                    data: {
+                        title: showData.showNameFormal,
+                        show: showData.showName,
+                        datestamp: filename.slice(0,12),
+                        dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
+                        mp3: urlPrefix + 'shows/' + filename,
+                        // ogg: ...,
+                        type: showData.type,
+                        showurl: showData.showURL,
+                        poster: showData.showIcon
+                    }
+                })
+            } finally { dbBar.tick() }
         }
     } catch (err) { console.log(err) }
 })
