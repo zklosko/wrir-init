@@ -25,7 +25,7 @@ const minioClient = new Minio.Client({
 });
 
 program
-    .version('0.0.2')
+    .version('0.0.3')
     .requiredOption('-f, --filepath <type>', 'directory to import')
     .option('-s --single', 'upload single file')
     .option('-m --music', 'upload to performances archive (uploads to show archive by default)')
@@ -33,7 +33,7 @@ program
 program.parse();
 const options = program.opts()
 
-function uploadMedia(bucket, filename, filepath) {
+const uploadMedia = (bucket, filename, filepath) => {
     minioClient.fPutObject(bucket, filename, filepath, function (err, etag) {
         if (err)
             return console.log(err);
@@ -41,7 +41,7 @@ function uploadMedia(bucket, filename, filepath) {
     });
 }
 
-function getAllFiles(dirPath, filesArray) {
+const getAllFiles = (dirPath, filesArray) => {
     // dirPath: str, filesArray: array
     files = fs.readdirSync(dirPath);
 
@@ -63,70 +63,89 @@ function getAllFiles(dirPath, filesArray) {
     return filesArray;
 }
 
-let result = []
-if (options.single) {
-    result.push(options.filepath)
-} else {
-    result = getAllFiles(options.filepath)
-    console.log('\n')
+const putShowInDB = async (showWeekday, filename, mp3) => {
+    let showData = await prisma.schedule.findUnique({
+        where: {
+            showID: {
+                weekday: showWeekday,
+                startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
+            }
+        },    
+    })
+    let createShow = await prisma.shows.create({
+        data: {
+            title: showData.showNameFormal,
+            show: showData.showName,
+            datestamp: filename.slice(0,12),
+            dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
+            mp3: mp3,
+            // ogg: ...,
+            type: showData.type,
+            showurl: showData.showURL,
+            poster: showData.showIcon
+        }
+    })
 }
 
-result.forEach(async(file) => {
-    let fileURL, filename, showWeekday, showData, urlPrefix
-    const tags = NodeID3.read(file)
+const putMusicInDB = async (tags, file, fpath) => {
+    await prisma.livemusic.create({
+        data: {
+            title: tags.title,
+            artist: tags.artist,
+            show: tags.album,
+            date: tags.year,
+            filetime: dayjs(fs.statSync(file).ctime).format(),
+            genre: tags.genre,
+            trackno: tags.trackNumber,
+            fpath: fpath
+        }
+    })
+}
 
-    urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
-    
-    if (options.music) {
-        // need to find way to get filepath with extension without directories (as seen on server)
-        if (!tags.artist) { tags.artist = 'Unknown' }
-        if (!tags.title) {tags.title = tags.trackNumber}
-        filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
-        uploadMedia('livemusic', filename, file)
-
-        // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
-        fileURL =  urlPrefix + 'livemusic/' + filename
-        await prisma.livemusic.create({
-            data: {
-                title: tags.title,
-                artist: tags.artist,
-                show: tags.album,
-                date: tags.year,
-                filetime: dayjs(fs.statSync(file).ctime).format(),
-                genre: tags.genre,
-                trackno: tags.trackNumber,
-                fpath: fileURL,
-            }
-        });
-
+const main = () => {
+    let result = []
+    if (options.single) {
+        result.push(options.filepath)
     } else {
-        let filenameArray = file.split("/")
-        filename = filenameArray[filenameArray.length - 1]  // get last part
+        result = getAllFiles(options.filepath)
+        console.log('\n')
+    }
 
-        showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
+    let filename, showWeekday, urlPrefix
+    urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/'
 
-        showData = await prisma.schedule.findUnique({
-            where: {
-                showID: {
-                    weekday: showWeekday,
-                    startTime: parseInt(filename.slice(8,12), 10),  // pulls show time from filename
-                }
-            },    
+    if (options.music) {
+        result.forEach((file) => {
+            try {
+                const tags = NodeID3.read(file)
+                if (!tags.artist) { tags.artist = 'Unknown' }
+                if (!tags.title) {tags.title = tags.trackNumber}
+                filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3'
+                let fpath = urlPrefix + 'livemusic/' + filename // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
+                
+                putMusicInDB(tags, file, fpath)
+                    .then(uploadMedia('livemusic', filename, file))    
+            } catch (err) {
+                console.log(err)
+            }
         })
-        uploadMedia('shows', filename, file)
+    } else {
+        result.forEach((file) => {
+            try {
+                let filenameArray = file.split("/")
+                filename = filenameArray[filenameArray.length - 1]  // get last part
         
-        await prisma.shows.create({
-            data: {
-                title: showData.showNameFormal,
-                show: showData.showName,
-                datestamp: filename.slice(0,12),
-                dateunix: dayjs(filename.slice(0,12), "YYYYMMDDhhmm").format(),
-                mp3: urlPrefix + 'shows/' + filename,
-                // ogg: ...,
-                type: showData.type,
-                showurl: showData.showURL,
-                poster: showData.showIcon
+                showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
+                let mp3 = urlPrefix + 'shows/' + filename
+
+                putShowInDB(showWeekday, filename, mp3)
+                    .then(uploadMedia('shows', filename, file))
+
+            } catch (err) {
+                console.log(err)
             }
         })
     }
-})
+}
+
+main()
