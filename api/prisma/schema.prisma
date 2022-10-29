@@ -2,43 +2,50 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "postgres"
+//   url      = env("DATABASE_URL")
+// }
+
 datasource db {
-  provider = "postgres"
-  url      = env("DATABASE_URL")
+  provider  = "sqlite"
+  url       = "file:./dev.db"
 }
 
 model shows {
+  showID    Int       @id @default(autoincrement())
   title     String
   show      String?
   datestamp String
-  dateunix  DateTime @id
-  mp3       String @unique
-  type      String
-  showurl   String
-  poster    String
+  dateunix  DateTime  @unique
+  mp3       String    @unique
+  ogg       String?
+  type      String?   @default("other")
+  showurl   String?
+  poster    String?
 }
 
 model schedule {
+  showID        Int  @id @default(autoincrement())
   weekday       String
-  startTime     Int
+  startTime     String
   showName      String
-  showNameFormal String
+  showNameFormal String?
   type          String  @default("other")
   dj            String?
   showURL       String?
   showIcon      String?
   showIcon2     String?
-
-  @@id(fields: [weekday, startTime], name: "showID")
 }
 
 model livemusic {
-  artist   String?
+  livemusicID Int       @id @default(autoincrement())
+  artist   String
   trackno  String?
-  title    String?
+  title    String
   show     String?
   date     String?
   filetime String?
-  genre    String? @default("None")
-  fpath    String  @id
+  genre    String?      @default("None")
+  fpath    String       @unique
 }

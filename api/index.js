@@ -11,15 +11,6 @@ app.engine('hbs', hbs.engine({defaultLayout: 'main', extname: '.hbs'}))
 app.set('view engine', 'hbs')
 app.use(express.json())
 
-// Settings for Express's sendFile() function
-// const sfOptions = {
-//     maxAge: '1d',
-//     headers: {
-//         'Access-Control-Allow-Origin': '*',
-//         'Content-Type': 'audio/mpeg',
-//     },
-// }
-
 // Routes start here
 app.get('/', async (req, res) => {
     const showlist = await prisma.shows.findMany()
@@ -31,41 +22,12 @@ app.get('/showlist', async (req, res) => {
     res.json(showlist)
 })
 
-// app.post('/addshow', async (req, res) => {
-//     const addshow = await prisma.shows.create({
-//         data: { ...req.body },
-//     })
-//     res.json(addshow)
-// })
-
-// app.get('/getshow', async (req, res) => {
-//     const showid = parseInt(req.query.id)  // host/getshow?id=1 INT
-//     const showquery = await prisma.shows.findUnique({
-//         where: {
-//             id: showid
-//         },
-//         select: {
-//             mp3: true,
-//             ogg: true
-//         }
-//     })
-//     // Implement track return here
-//     res.sendFile(showquery.mp3, sfOptions) // only works with filesystem
-// })
-
 /////////
 
 app.get('/livesound', async (req, res) => {
     const showlist = await prisma.livemusic.findMany()
     res.json(showlist)
 })
-
-// app.post('/addlivesound', async (req, res) => {
-//     const addlivesound = await prisma.livemusic.create({
-//         data: { ...req.body },
-//     })
-//     res.json(addlivesound)
-// })
 
 app.get('/livebands', async (req, res) => {
     const bandlist = await prisma.livemusic.findMany({
@@ -100,21 +62,6 @@ app.get('/livegenre', async (req, res) => {
     // Return array
     res.json(_.chain(cleanGenrelist).uniq().sortBy().value())
 })
-
-// app.get('/gettrack', async (req, res) => {
-//     const trackid = parseInt(req.query.id) // host/gettrack?id=1 INT
-//     const trackquery = await prisma.livemusic.findUnique({
-//         where: {
-//             id: trackid
-//         },
-//         select: {
-//             fpath: true
-//         }
-//     })
-//     // Implement track return here
-//     // res.sendFile(trackquery.filepath, sfOptions)
-//     res.redirect(302, trackquery.fpath)  // to serve from object storage
-// })
 
 // 404 handling
 app.use((req, res, next) => {

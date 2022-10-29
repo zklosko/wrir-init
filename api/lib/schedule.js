@@ -12,23 +12,31 @@ const prisma = new PrismaClient();
 const result = [];
 
 const checkIfCurrent = async function(showObj) {
+    // TODO: plan what happens when new show enters old timeslot
     // query will be empty array if nothing found
-    const query = await prisma.schedule.findUnique({
+    const query = await prisma.schedule.findMany({
         where: {
-            showID: {
-                weekday: showObj.weekday,
-                startTime: parseInt(showObj.startTime),
-            }
-        },
+          AND: {
+            weekday: {
+              equals: showObj.weekday
+            },
+            startTime: {
+              equals: showObj.startTime
+            },
+//            showName: {
+//              equals: showObj.showName
+//            }
+          }
+        }
     })
 
     // incoming show has unique timeslot
-    if (!query) {
+    if (query.length === 0) {
         // add to database
         await prisma.schedule.create({
             data: {
                 weekday: showObj.weekday,
-                startTime: parseInt(showObj.startTime),
+                startTime: showObj.startTime,
                 showName: showObj.showName,
                 showNameFormal: showObj.showNameFormal,
                 type: showObj.type,
@@ -38,28 +46,6 @@ const checkIfCurrent = async function(showObj) {
                 showIcon2: showObj.showIcon2,
             }
         })    
-
-    // incoming show replaces old show's timeslot
-    } else {
-        await prisma.schedule.update({
-            where: {
-                showID: {
-                    weekday: showObj.weekday,
-                    startTime: parseInt(showObj.startTime, 10),
-                }     
-            },
-            data: {
-                weekday: showObj.weekday,
-                startTime: parseInt(showObj.startTime),
-                showName: showObj.showName,
-                showNameFormal: showObj.showNameFormal,
-                type: showObj.type,
-                dj: showObj.dj,
-                showURL: showObj.showURL,
-                showIcon: showObj.showIcon,
-                showIcon2: showObj.showIcon2
-            }
-        })
     }
 }
 

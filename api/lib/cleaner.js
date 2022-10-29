@@ -34,19 +34,15 @@ async function main(deletionDate) {
         let filenameArray = el.mp3.split("/")
         let filename = filenameArray[filenameArray.length - 1]  // get last part
         
-        try {
-            minioClient.removeObject('shows', filename, (e) => {
-                if (e) {
-                    console.log('Unable to delete ' + filename + '\n' + e)
-                } else {
-                    deleteShowFromDB(el)
-                }
-            })
-        } catch(err) {
-            console.error(err)
-        } finally {
-            console.log('Show removed: ' + filename + '\n')
-        }
+        minioClient.removeObject('shows', filename, (e) => {
+            if (e) {
+                console.log('Unable to delete ' + filename + '\n' + e)
+            } else {
+                deleteShowFromDB(el)
+            }
+        })
+
+        console.log('Show removed: ' + filename + '\n')
     })
 }
 
