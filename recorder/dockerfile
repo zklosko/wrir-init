@@ -1,0 +1,13 @@
+FROM ubuntu:20.04
+
+RUN apt update &&
+    apt -y install cron ffmpeg tzdata procps id3v2
+
+COPY crontab /etc/cron.d/crontab
+
+COPY scripts/ /scripts
+
+RUN chmod 0644 /etc/cron.d/crontab &&
+    crontab /etc/cron.d/crontab
+
+CMD ["cron", "-f"]
