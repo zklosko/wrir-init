@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node ./index.js",
     "ingest": "node ./lib/ingest.js",
-    "schedule": "node ./lib/schedule.js",
-      "clean": "node ./lib/cleaner.js",
+    "schedule": "node ./lib/schedule.js"
   },
   "keywords": [],
   "author": "Zachary Klosko",

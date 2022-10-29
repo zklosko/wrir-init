@@ -27,7 +27,7 @@ async function deleteShowFromDB(el) {
     })
 }
 
-async function main(deletionDate) {
+export default async function cleaner(deletionDate) {
     let list = await prisma.$queryRaw`select mp3, dateunix from shows where dateunix < ${deletionDate}::timestamp;`
 
     list.forEach(el => {
@@ -45,5 +45,3 @@ async function main(deletionDate) {
         console.log('Show removed: ' + filename + '\n')
     })
 }
-
-main(deletionDate)

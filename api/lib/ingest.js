@@ -1,4 +1,4 @@
-// Note: this script only ingests MP3s. OGG files may be added later.
+// README: this script only ingests MP3s. OGG files may be added later.
 // Test: node lib/ingest.js -l shows -f "/Users/zacharyklosko/Desktop/WRIRtest/raw"
 
 const fs = require('fs');
@@ -89,8 +89,6 @@ function uploadMusic(file, callback) {
 function uploadShow(file, callback) {
     let filenameArray = file.split("/");
     let filename = filenameArray[filenameArray.length - 1]; // get last part
-
-    // let showWeekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
     let mp3 = urlPrefix + 'shows/' + filename;
 
     minioClient.fPutObject('shows', filename, file, async function (err, etag) {
@@ -107,7 +105,7 @@ function uploadShow(file, callback) {
                             equals: filename.slice(8,12)
                         },
                         // showName: {
-                        //     equals: showObj.showName
+                        //     equals: // showName from file [13,infinity-extension]
                         // }
                     }
                 }

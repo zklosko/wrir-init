@@ -1,3 +1,5 @@
+// README: Assumes shows being ingested are on current schedule. Does not check legacy schedules.
+
 const csvParser = require("csv-parser");
 const needle = require("needle");
 
@@ -12,7 +14,6 @@ const prisma = new PrismaClient();
 const result = [];
 
 const checkIfCurrent = async function(showObj) {
-    // TODO: plan what happens when new show enters old timeslot
     // query will be empty array if nothing found
     const query = await prisma.schedule.findMany({
         where: {
@@ -23,9 +24,6 @@ const checkIfCurrent = async function(showObj) {
             startTime: {
               equals: showObj.startTime
             },
-//            showName: {
-//              equals: showObj.showName
-//            }
           }
         }
     })
@@ -45,7 +43,30 @@ const checkIfCurrent = async function(showObj) {
                 showIcon: showObj.showIcon,
                 showIcon2: showObj.showIcon2,
             }
-        })    
+        })
+    } else {
+        // update database record for current time timeslot
+        await prisma.schedule.update({
+            where: {
+                AND: {
+                    weekday: {
+                        equals: showObj.weekday
+                    },
+                    startTime: {
+                        equals: showObj.startTime
+                    },
+                }
+            },
+            data: {
+                showName: showObj.showName,
+                showNameFormal: showObj.showNameFormal,
+                type: showObj.type,
+                dj: showObj.dj,
+                showURL: showObj.showURL,
+                showIcon: showObj.showIcon,
+                showIcon2: showObj.showIcon2,
+            }
+        })
     }
 }
 
