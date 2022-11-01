@@ -16,7 +16,7 @@ const minioClient = new Minio.Client({
     secretKey: process.env.MINIO_SECRET_KEY
 });
 
-const deleteOlderThan = 30  // days
+const deleteOlderThan = 15  // days
 const deletionDate = dayjs().subtract(deleteOlderThan, 'day').toISOString()
 
 async function deleteShowFromDB(el) {
@@ -27,7 +27,7 @@ async function deleteShowFromDB(el) {
     })
 }
 
-export default async function cleaner(deletionDate) {
+async function cleaner(deletionDate) {
     let list = await prisma.$queryRaw`select mp3, dateunix from shows where dateunix < ${deletionDate}::timestamp;`
 
     list.forEach(el => {
@@ -45,3 +45,5 @@ export default async function cleaner(deletionDate) {
         console.log('Show removed: ' + filename + '\n')
     })
 }
+
+cleaner(deletionDate)

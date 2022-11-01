@@ -1,7 +1,7 @@
 const express = require("express")
 const hbs = require("express-handlebars")
 const _ = require("underscore")
-const { cleaner } = require('lib/cleaner')
+// const { cleaner } = require('lib/cleaner.js')
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
@@ -23,12 +23,12 @@ app.get('/showlist', async (req, res) => {
     res.json(showlist)
 })
 
-app.post('/cleanup/:days', async (req, res) => {
-    const deletionDays = parseInt(req.query.days, 10);
-    cleaner(deletionDays)
+// app.post('/cleanup/:days', async (req, res) => {
+//     const deletionDays = parseInt(req.query.days, 10);
+//     cleaner(deletionDays)
 
-    res.json({"shows": "cleaned up", "days deleted": deletionDays})
-})
+//     res.json({"shows": "cleaned up", "days deleted": deletionDays})
+// })
 
 /////////
 
