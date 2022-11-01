@@ -125,5 +125,5 @@ else
 fi
 
 # TODO: Remove once new API is off the ground
-cp -f showdata.txt /shows  # updating showdata.txt file for files.wrir.org scripts
+# cp -f showdata.txt /shows  # updating showdata.txt file for files.wrir.org scripts
 

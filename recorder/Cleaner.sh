@@ -4,7 +4,7 @@
 sDays=1
 echo Starting $0 $(date)
 
-find /scripts/raw/* -ctime +${sDays} -delete
+find /srv/recorder/raw/* -ctime +${sDays} -delete
 
 # Cleaning files in publish a.k.a. files.wrir.org/shows
 # sDir="/srv/static/shows"

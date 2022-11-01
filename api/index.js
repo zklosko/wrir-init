@@ -23,12 +23,12 @@ app.get('/showlist', async (req, res) => {
     res.json(showlist)
 })
 
-app.post('/cleanup/:days', async (req, res_ => {
+app.post('/cleanup/:days', async (req, res) => {
     const deletionDays = parseInt(req.query.days, 10);
     cleaner(deletionDays)
 
     res.json({"shows": "cleaned up", "days deleted": deletionDays})
-}))
+})
 
 /////////
 
