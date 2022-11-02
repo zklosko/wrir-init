@@ -19,12 +19,12 @@ const objStorURL = process.env.MINIO_URL
 const Minio = require('minio');
 const minioClient = new Minio.Client({
     endPoint: objStorURL,
-    port: 9000,
-    useSSL: false,
+    port: 443,
+    useSSL: true,
     accessKey: process.env.MINIO_ACCESS_KEY,
     secretKey: process.env.MINIO_SECRET_KEY
 });
-const urlPrefix = minioClient.protocol + '//' + objStorURL + ':' + minioClient.port + '/';
+const urlPrefix = minioClient.protocol + '//' + 'wrirwebarchive' + '.' + objStorURL + '/';
 
 program
     .version('0.0.3')
@@ -64,7 +64,7 @@ function uploadMusic(file, callback) {
     let filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3';
     let fpath = urlPrefix + 'livemusic/' + filename; // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
 
-    minioClient.fPutObject('livemusic', filename, file, async function (err, etag) {
+    minioClient.fPutObject('wrirwebarchive', 'livemusic/' + filename, file, {'x-amz-acl': 'public-read'}, async function (err, etag) {
         if (err) {
             return console.log(err);
         } else {

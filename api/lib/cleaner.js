@@ -10,8 +10,8 @@ const objStorURL = process.env.MINIO_URL
 const Minio = require('minio');
 const minioClient = new Minio.Client({
     endPoint: objStorURL,
-    port: 9000,
-    useSSL: false,
+    port: 443,
+    useSSL: true,
     accessKey: process.env.MINIO_ACCESS_KEY,
     secretKey: process.env.MINIO_SECRET_KEY
 });
@@ -34,7 +34,7 @@ async function cleaner(deletionDate) {
         let filenameArray = el.mp3.split("/")
         let filename = filenameArray[filenameArray.length - 1]  // get last part
         
-        minioClient.removeObject('shows', filename, (e) => {
+        minioClient.removeObject('wrirwebarchive', 'shows' + filename, (e) => {
             if (e) {
                 console.log('Unable to delete ' + filename + '\n' + e)
             } else {
