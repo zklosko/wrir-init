@@ -13,7 +13,12 @@ const prisma = new PrismaClient();
 
 const result = [];
 
-const checkIfCurrent = async function(showObj) {
+const checkIfCurrent = async function(showObj) {  
+  // Condition for skipping legacy programming
+  if (showObj.startTime === '0000') {
+    return
+  }
+
     // query will be empty array if nothing found
     const query = await prisma.schedule.findMany({
         where: {
