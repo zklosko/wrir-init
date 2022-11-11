@@ -2,14 +2,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgres"
-//   url      = env("DATABASE_URL")
-// }
-
 datasource db {
-  provider  = "sqlite"
-  url       = "file:./dev.db"
+  provider = "postgres"
+  url      = env("DATABASE_URL")
 }
 
 model shows {
@@ -27,6 +22,7 @@ model shows {
 
 model schedule {
   showID        Int  @id @default(autoincrement())
+  timeslot      String  @unique
   weekday       String
   startTime     String
   showName      String
