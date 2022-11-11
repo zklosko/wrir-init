@@ -95,7 +95,7 @@ function uploadShow(file, callback) {
     let startTime = filename.slice(8,12)
     let showName = filename.split('.')[1]
 
-    minioClient.fPutObject('shows', filename, file, async function (err, etag) {
+    minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, async function (err, etag) {
         if (err) {
             return console.log(err);
         } else {
