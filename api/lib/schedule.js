@@ -19,60 +19,31 @@ const checkIfCurrent = async function(showObj) {
     return
   }
 
-    // query will be empty array if nothing found
-    const query = await prisma.schedule.findMany({
-        where: {
-          AND: {
-            weekday: {
-              equals: showObj.weekday
-            },
-            startTime: {
-              equals: showObj.startTime
-            },
-          }
-        }
-    })
+  // query will be empty array if nothing found
+  const query = await prisma.schedule.findUnique({
+      where: {
+        timeslot: showObj.weekday + showObj.startTime + showObj.showName,
+      }
+  })
 
-    // incoming show has unique timeslot
-    if (query.length === 0) {
-        // add to database
-        await prisma.schedule.create({
-            data: {
-                weekday: showObj.weekday,
-                startTime: showObj.startTime,
-                showName: showObj.showName,
-                showNameFormal: showObj.showNameFormal,
-                type: showObj.type,
-                dj: showObj.dj,
-                showURL: showObj.showURL,
-                showIcon: showObj.showIcon,
-                showIcon2: showObj.showIcon2,
-            }
-        })
-    } else {
-        // update database record for current time timeslot
-        await prisma.schedule.update({
-            where: {
-                AND: {
-                    weekday: {
-                        equals: showObj.weekday
-                    },
-                    startTime: {
-                        equals: showObj.startTime
-                    },
-                }
-            },
-            data: {
-                showName: showObj.showName,
-                showNameFormal: showObj.showNameFormal,
-                type: showObj.type,
-                dj: showObj.dj,
-                showURL: showObj.showURL,
-                showIcon: showObj.showIcon,
-                showIcon2: showObj.showIcon2,
-            }
-        })
-    }
+  // if incoming show has unique timeslot, add to database
+  // show lookup is done by daytimeshowname, so old shows can stay
+  if (query == null) {
+      await prisma.schedule.create({
+          data: {
+              timeslot: showObj.weekday + showObj.startTime + showObj.showName,
+              weekday: showObj.weekday,
+              startTime: showObj.startTime,
+              showName: showObj.showName,
+              showNameFormal: showObj.showNameFormal,
+              type: showObj.type,
+              dj: showObj.dj,
+              showURL: showObj.showURL,
+              showIcon: showObj.showIcon,
+              showIcon2: showObj.showIcon2,
+          }
+      })
+  }
 }
 
 needle

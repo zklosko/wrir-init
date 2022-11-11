@@ -91,23 +91,17 @@ function uploadShow(file, callback) {
     let filename = filenameArray[filenameArray.length - 1]; // get last part
     let mp3 = urlPrefix + 'shows/' + filename;
 
+    let weekday = dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
+    let startTime = filename.slice(8,12)
+    let showName = filename.split('.')[1]
+
     minioClient.fPutObject('shows', filename, file, async function (err, etag) {
         if (err) {
             return console.log(err);
         } else {
-            let showData = await prisma.schedule.findFirst({
+            let showData = await prisma.schedule.findUnique({
                 where: {
-                    AND: {
-                        weekday: {
-                            equals: dayjs(filename.slice(0,9), "YYYYMMDD").format("dddd")
-                        },
-                        startTime: {
-                            equals: filename.slice(8,12)
-                        },
-                        // showName: {
-                        //     equals: // showName from file [13,infinity-extension]
-                        // }
-                    }
+                    timeslot: weekday + startTime + showName
                 }
             });
             let createShow = await prisma.shows.create({
@@ -153,3 +147,11 @@ function main() {
 }
 
 main()
+    .then(async () => {
+        await prisma.$disconnect()
+    })
+    .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
