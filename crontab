@@ -25,5 +25,5 @@
 @reboot bash /srv/recorder/RecRunner.sh &
 0,30 * * * * bash /srv/recorder/RecRunner.sh &
 @daily bash /srv/recorder/lsdb2.sh &
-@monthly bash /srv/recorder/cleaner.sh &
+@daily bash /srv/recorder/cleaner.sh &
 0 0 1 */4 * du -hd 1 | sort -rh /srv/shares/Z/VOLUNTEERS > ~/volunteerquota.txt
