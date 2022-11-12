@@ -86,7 +86,7 @@ function uploadMusic(file, callback) {
     });
 }
 
-function uploadShow(file, callback) {
+async function uploadShow(file, callback) {
     let filenameArray = file.split("/");
     let filename = filenameArray[filenameArray.length - 1]; // get last part
     let mp3 = urlPrefix + 'shows/' + filename;
@@ -95,32 +95,33 @@ function uploadShow(file, callback) {
     let startTime = filename.slice(8,12)
     let showName = filename.split('.')[1]
 
-    minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, {'x-amz-acl': 'public-read'}, async function (err, etag) {
+    minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, {'x-amz-acl': 'public-read'}, (err, etag) => {
         if (err) {
             return console.log(err);
-        } else {
-            let showData = await prisma.schedule.findUnique({
-                where: {
-                    timeslot: weekday + startTime + showName
-                }
-            });
-            let createShow = await prisma.shows.create({
-                data: {
-                    title: showData.showNameFormal,
-                    show: showData.showName,
-                    datestamp: filename.slice(0, 12),
-                    dateunix: dayjs(filename.slice(0, 12), "YYYYMMDDhhmm").format(),
-                    mp3: mp3,
-                    // ogg: ...,
-                    type: showData.type,
-                    showurl: showData.showURL,
-                    poster: showData.showIcon
-                }
-            });
         }
-        console.log('File ' + filename + ' uploaded successfully');
-        callback()
     });
+
+    let showData = await prisma.schedule.findUnique({
+        where: {
+            timeslot: weekday + startTime + showName
+        }
+    });
+    let createShow = await prisma.shows.create({
+        data: {
+            title: showData.showNameFormal,
+            show: showData.showName,
+            datestamp: filename.slice(0, 12),
+            dateunix: dayjs(filename.slice(0, 12), "YYYYMMDDhhmm").format(),
+            mp3: mp3,
+            // ogg: ...,
+            type: showData.type,
+            showurl: showData.showURL,
+            poster: showData.showIcon
+        }
+    });
+    
+    console.log('File ' + filename + ' uploaded successfully');
+    callback()
 }
 
 function main() {
@@ -147,11 +148,3 @@ function main() {
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect()
-    })
-    .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
