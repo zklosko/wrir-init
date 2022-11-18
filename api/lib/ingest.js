@@ -10,7 +10,11 @@ const NodeID3 = require('node-id3');
 
 const dayjs = require('dayjs');
 let customParseFormat = require('dayjs/plugin/customParseFormat')
+var utc = require('dayjs/plugin/utc')
+var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
 dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
@@ -111,7 +115,7 @@ async function uploadShow(file, callback) {
             title: showData.showNameFormal,
             show: showData.showName,
             datestamp: filename.slice(0, 12),
-            dateunix: dayjs(filename.slice(0, 12), "YYYYMMDDhhmm").format(),
+            dateunix: dayjs(filename.slice(0, 12), "YYYYMMDDhhmm").tz("America/New_York").format(),
             mp3: mp3,
             // ogg: ...,
             type: showData.type,
@@ -119,7 +123,7 @@ async function uploadShow(file, callback) {
             poster: showData.showIcon
         }
     });
-    
+
     console.log('File ' + filename + ' uploaded successfully');
     callback()
 }
