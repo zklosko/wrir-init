@@ -1,34 +1,22 @@
 const express = require("express")
-const hbs = require("express-handlebars")
 const _ = require("underscore")
-// const { cleaner } = require('lib/cleaner.js')
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const app = new express()
 
-app.engine('hbs', hbs.engine({defaultLayout: 'main', extname: '.hbs'}))
-app.set('view engine', 'hbs')
 app.use(express.json())
 
 // Routes start here
 app.get('/', async (req, res) => {
-    const showlist = await prisma.shows.findMany()
-    res.render('index', { show: showlist })
+    res.json({hi: 'WRIR!'})
 })
 
 app.get('/showlist', async (req, res) => {
     const showlist = await prisma.shows.findMany()
     res.json(showlist)
 })
-
-// app.post('/cleanup/:days', async (req, res) => {
-//     const deletionDays = parseInt(req.query.days, 10);
-//     cleaner(deletionDays)
-
-//     res.json({"shows": "cleaned up", "days deleted": deletionDays})
-// })
 
 /////////
 
