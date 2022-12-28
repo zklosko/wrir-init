@@ -54,14 +54,11 @@ needle
   }))
   .on("data", (data) => {
     result.push(data); // final object captured
-    // checkIfCurrent(data)
   })
   .on("done", (err) => {
     if (err) console.log("An error has occurred");
-    // else console.log(result);
     result.forEach(show => {
         checkIfCurrent(show)
-        // console.log(show)
     });
   });
 
