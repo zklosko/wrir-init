@@ -29,7 +29,7 @@ program
 program.parse();
 const options = program.opts()
 
-const urlPrefix = minioClient.protocol + '//' + 'wrirwebarchive' + '.' + objStorURL + '/';
+const urlPrefix = 'https://wrirwebarchive.nyc3.spaces.digitalocean.com/';
 
 function getAllFiles(dirPath, filesArray) {
     // dirPath: str, filesArray: array
