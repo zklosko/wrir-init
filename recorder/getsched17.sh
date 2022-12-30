@@ -123,6 +123,3 @@ else
   cp shows.txt shows.old.$(date "+%Y%m%d%H%M%S")
   mv shows.$$ shows.txt
 fi
-
-cp -f showdata.txt /srv/static/shows  # updating showdata.txt file for files.wrir.org scripts
-

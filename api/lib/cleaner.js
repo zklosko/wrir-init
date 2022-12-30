@@ -26,7 +26,7 @@ async function cleaner(deletionDate) {
         
         minioClient.removeObject('wrirwebarchive', 'shows' + filename, (e) => {
             if (e) {return console.log('Unable to delete ' + filename + '\n' + e)}
-            then(deleteShowFromDB(el))
+            deleteShowFromDB(el)
         })
 
         console.log('Show removed: ' + filename + '\n')

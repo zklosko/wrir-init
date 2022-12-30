@@ -2,7 +2,7 @@
 #ps -ef | grep -v $$ | grep -q $0 && exit
 echo Start $0
 
-cd /srv/recorder/raw/
+cd /recorder/raw/
 
 ls -1r *.mp3.new |
 while read sFile

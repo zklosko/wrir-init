@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cd /srv/recorder
+cd /recorder
 date -R
 bash ./whatson4.sh &  
-sleep 60
+sleep 30
 bash ./posted.sh  # none -> .new + .publish
 bash ./getInfo2.sh  # .new -> .info
 bash ./Publish.sh  # .publish -> .tfr -> .done
