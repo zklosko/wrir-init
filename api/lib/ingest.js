@@ -121,8 +121,14 @@ async function uploadShow(file, callback) {
     minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, {'x-amz-acl': 'public-read'}, (err, etag) => {
         if (err) {return console.log(err);}
         console.log('File ' + filename + ' uploaded successfully');
-        let showData = findShow(weekday, startTime, showName)
-        addShowToDB(showData, filename, mp3) 
+        let showData
+        try {
+            showData = findShow(weekday, startTime, showName)
+        } catch (err) {
+            return console.log(err)
+        } finally {
+            addShowToDB(showData, filename, mp3)
+        }
     });
 
     callback()
