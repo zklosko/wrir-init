@@ -21,7 +21,7 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
 program
-    .version('0.0.3')
+    .version('0.1.0')
     .requiredOption('-f, --filepath <type>', 'directory to import')
     .option('-s --single', 'upload single file')
     .option('-m --music', 'upload to performances archive (uploads to show archive by default)')
@@ -29,7 +29,7 @@ program
 program.parse();
 const options = program.opts()
 
-const urlPrefix = 'https://wrirwebarchive.nyc3.digitaloceanspaces.com';
+const urlPrefix = 'https://wrirwebarchive.nyc3.digitaloceanspaces.com/';
 
 function getAllFiles(dirPath, filesArray) {
     // dirPath: str, filesArray: array
@@ -42,7 +42,7 @@ function getAllFiles(dirPath, filesArray) {
             filesArray = getAllFiles(dirPath + "/" + file, filesArray);
         } else if (path.extname(file) === '.mp3') {
             // Is mp3
-            console.log('Found showfile ' + file);
+            console.log(`Found showfile ${file}`);
             filesArray.push(path.join(dirPath, "/", file));
         } else {
             // Is file but not mp3
@@ -118,16 +118,16 @@ async function uploadShow(file, callback) {
     let startTime = filename.slice(8,12)
     let showName = filename.split('.')[1]
 
-    minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, {'x-amz-acl': 'public-read'}, (err, etag) => {
+    minioClient.fPutObject('wrirwebarchive', 'shows/' + filename, file, {'x-amz-acl': 'public-read'}, async (err, etag) => {
         if (err) {return console.log(err);}
-        console.log('File ' + filename + ' uploaded successfully');
+        console.log(`File ${filename} uploaded successfully`);
         let showData
         try {
-            showData = findShow(weekday, startTime, showName)
+            showData = await findShow(weekday, startTime, showName)
         } catch (err) {
             return console.log(err)
         } finally {
-            addShowToDB(showData, filename, mp3)
+            await addShowToDB(showData, filename, mp3)
         }
     });
 
