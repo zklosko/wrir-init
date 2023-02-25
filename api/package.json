@@ -12,18 +12,18 @@
   "author": "Zachary Klosko",
   "license": "",
   "devDependencies": {
+    "nodemon": "^2.0.20",
     "prisma": "^4.2.1"
   },
   "dependencies": {
     "@prisma/client": "^4.2.1",
     "async": "^3.2.4",
+    "axios": "^1.2.2",
     "commander": "^8.3.0",
-    "csv-parser": "^3.0.0",
     "dayjs": "^1.10.7",
     "dotenv": "^16.0.1",
     "express": "^4.17.1",
     "minio": "^7.0.32",
-    "needle": "^3.1.0",
     "node-id3": "^0.2.3",
     "underscore": "^1.13.1"
   }
