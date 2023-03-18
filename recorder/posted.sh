@@ -39,7 +39,6 @@ do
   sProg=${sNew:18}
   sProg=${sProg%%.mp3.new}
   echo GG ${sFile} ${sProg}
-  #sox "${sFile}-[0-2]*.mp3" -C-9.2 ${sFile}.${sProg}.lo.mp3 stats 2> ${sFile}.${sProg}.stats.txt
   
   #sDur=$(grep "Length s" ${sFile}.${sProg}.stats.txt|awk '{printf "%i\n",$3+0.5}')
   #echo "DURS|${sDur}|" > ${sFile}.${sProg}.audio.txt
@@ -48,16 +47,14 @@ do
   sTime="${sNew:8:4}"
   if grep "^$(date -d ${sDate} +%A)|${sTime}" ../showdata.txt | cut -f5 -d'|' | egrep "music|local"
   then
-    #sox "${sFile}-[0-2]*.wav" -C-0.2 ${sFile}.${sProg}.hi.mp3
-    #sox -m "${sFile}-[0-2]*.mp3" ${sFile}.${sProg}.mp3
     echo OOO "${sFile}.${sProg}.mp3"
     sPLS=$(mktemp)
     find . -maxdepth 1 -name "${sFile}-[0-2]*.mp3" -printf "file $PWD/'%P'\n" > ${sPLS}
     ffmpeg -f concat -safe 0  -i ${sPLS} -c copy "${sFile}.${sProg}.mp3"
+    ffmpeg -i "${sFile}.${sProg}.mp3" -ar 44100 -ac 2 -b:a 128k "${sFile}.${sProg}.web.mp3"
     rm ${sPLS}
     #ffmpeg "copy ${sFile}.${sProg}.mp3" "${sFile}.${sProg}.ogg"
-    ffmpeg -i "${sFile}.${sProg}.mp3" -codec:a libvorbis "${sFile}.${sProg}.ogg"
-    #sox "${sFile}-[0-2]*.mp3" -C3 ${sFile}.${sProg}.ogg  # soundexchange, was compressing files
+    # ffmpeg -i "${sFile}.${sProg}.mp3" -codec:a libvorbis "${sFile}.${sProg}.ogg"
     touch ${sFile}.${sProg}.publish
   fi
   rm ${sFile}-[0-2]*.mp3

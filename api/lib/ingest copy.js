@@ -24,6 +24,7 @@ program
     .version('0.1.0')
     .requiredOption('-f, --filepath <type>', 'directory to import')
     .option('-s --single', 'upload single file')
+    .option('-m --music', 'upload to performances archive (uploads to show archive by default)')
 
 program.parse();
 const options = program.opts()
@@ -52,6 +53,21 @@ function getAllFiles(dirPath, filesArray) {
     return filesArray;
 }
 
+async function addMusicToDB(tags, filetime, fpath) {
+    await prisma.livemusic.create({
+        data: {
+            title: tags.title,
+            artist: tags.artist,
+            show: tags.album,
+            date: tags.year,
+            filetime: filetime,
+            genre: tags.genre,
+            trackno: tags.trackNumber,
+            fpath: fpath
+        }
+    });
+}
+
 async function findShow(weekday, startTime, showName) {
     let query = await prisma.schedule.findUnique({
         where: {
@@ -75,6 +91,22 @@ async function addShowToDB(showData, filename, mp3) {
             poster: showData.showIcon
         }
     });
+}
+
+function uploadMusic(file, callback) {
+    const tags = NodeID3.read(file);
+    if (!tags.artist) { tags.artist = 'Unknown'; }
+    if (!tags.title) { tags.title = tags.trackNumber; }
+    let filename = tags.artist.replace(/ /g, "_") + '/' + tags.title.replace(/ /g, "_") + '.mp3';
+    let fpath = urlPrefix + 'livemusic/' + filename; // maybe use https://serverurl.com:port/livemusic/year/artist/track for fileurl
+    let filetime = dayjs(fs.statSync(file).ctime).format()
+
+    minioClient.fPutObject('wrirwebarchive', 'livemusic/' + filename, file, {'x-amz-acl': 'public-read'}, (err, etag) => {
+        if (err) {return console.log(err);}
+        addMusicToDB(tags, filetime, fpath)
+    });
+
+    callback()
 }
 
 async function uploadShow(file, callback) {
@@ -113,7 +145,11 @@ function main() {
 
     var tasks = files.map(function(f) {
         return function(callback) {
-            uploadShow(f, callback)
+            if (options.music) {
+                uploadMusic(f, callback)
+            } else {
+                uploadShow(f, callback)
+            }
         }
     })
 

@@ -33,15 +33,3 @@ model schedule {
   showIcon      String?
   showIcon2     String?
 }
-
-model livemusic {
-  livemusicID Int       @id @default(autoincrement())
-  artist   String
-  trackno  String?
-  title    String
-  show     String?
-  date     String?
-  filetime String?
-  genre    String?      @default("None")
-  fpath    String       @unique
-}

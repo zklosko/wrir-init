@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model shows {
+  showID    Int       @id @default(autoincrement())
+  showName  String
+  datestamp String
+  dateunix  DateTime  @unique
+  mp3       String    @unique
+  // ogg       String?
+}
+
+model schedule {
+  showID    Int  @id @default(autoincrement())
+  timeslot  String
+  showName  String @unique
+  category  String  @default("other")
+  url       String?
+  icon      String?
+}
+
+// model livemusic {
+//   livemusicID Int       @id @default(autoincrement())
+//   artist   String
+//   trackno  String?
+//   title    String
+//   show     String?
+//   date     String?
+//   filetime String?
+//   genre    String?      @default("None")
+//   mp3      String       @unique
+// }
