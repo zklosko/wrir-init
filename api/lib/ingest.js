@@ -6,7 +6,6 @@ const path = require('path');
 const { parallelLimit } = require('async');
 require('dotenv').config();
 const { program } = require('commander');
-const NodeID3 = require('node-id3');
 const { minioClient } = require('./minioClient.js')
 
 const dayjs = require('dayjs');
